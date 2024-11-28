@@ -1,14 +1,10 @@
-import re  # Импортируем модуль для работы с регулярными выражениями.
-
-# Словарь для замены текстовых операций на математические символы.
+import re
 OPERATIONS = {
     "плюс": "+",
     "минус": "-",
     "умножить на": "*",
     "разделить на": "/"
 }
-
-# Словарь, где каждому числу на русском языке соответствует его числовое значение.
 WORDS_TO_NUMS = {
     "ноль": 0, "один": 1, "два": 2, "три": 3, "четыре": 4, "пять": 5, "шесть": 6,
     "семь": 7, "восемь": 8, "девять": 9, "десять": 10, "одиннадцать": 11, "двенадцать": 12,
@@ -17,128 +13,119 @@ WORDS_TO_NUMS = {
     "тридцать": 30, "сорок": 40, "пятьдесят": 50, "шестьдесят": 60, "семьдесят": 70,
     "восемьдесят": 80, "девяносто": 90, "сто": 100
 }
-
-# Словарь, который генерируется автоматически на основе WORDS_TO_NUMS, чтобы преобразовать число обратно в слово.
 NUMS_TO_WORDS = {v: k for k, v in WORDS_TO_NUMS.items()}
-
-
-# Функция для преобразования числа в текстовое представление.
 def number_to_words(number):
-    """Преобразует число в текстовое представление."""
-    # Если число отрицательное, добавляем "минус" и рекурсивно вызываем функцию для положительного числа.
+    '''The function converts an integer value to a text format.
+
+    Args:
+        number (int): integer response.
+
+    Returns:
+        ... (str): a list connected to a string using spaces.
+    '''
+
     if number < 0:
         return "минус " + number_to_words(-number)
-
-    # Если число есть в словаре, возвращаем соответствующее слово.
     if number in NUMS_TO_WORDS:
         return NUMS_TO_WORDS[number]
-
-    parts = []  # Список для хранения частей числа в виде слов.
-
-    # Обрабатываем сотни.
+    parts = []
     if number >= 100:
         hundreds = (number // 100) * 100
-        parts.append(NUMS_TO_WORDS[hundreds])  # Добавляем сотни в список.
-        number %= 100  # Оставляем остаток (меньше 100).
-
-    # Обрабатываем десятки (для чисел больше 20).
+        parts.append(NUMS_TO_WORDS[hundreds])
+        number %= 100
     if number >= 20:
         tens = (number // 10) * 10
-        parts.append(NUMS_TO_WORDS[tens])  # Добавляем десятки в список.
-        number %= 10  # Оставляем остаток (единицы).
-
-    # Если число больше 0, добавляем его в конец списка.
+        parts.append(NUMS_TO_WORDS[tens])
+        number %= 10
     if number > 0:
         parts.append(NUMS_TO_WORDS[number])
-
-    # Возвращаем строку, соединяя части через пробел.
     return " ".join(parts)
 
-
-# Функция для преобразования текстового числа в числовое.
 def words_to_number(text):
-    """Преобразует текстовое число в числовое."""
-    parts = text.split()  # Разбиваем строку на слова.
-    total = 0  # Переменная для хранения результата.
+    '''Converts a number written in text format to an integer value.
 
-    # Преобразуем каждое слово в число, если оно есть в словаре.
+    Args:
+        text (str): a string with a number written in text format.
+
+    Returns:
+        total (int): the result of the number translation.
+    '''
+
+    parts = text.split()
+    total = 0
     for part in parts:
         if part in WORDS_TO_NUMS:
             total += WORDS_TO_NUMS[part]
-
-    # Возвращаем итоговое число.
     return total
 
-
-# Функция для преобразования текстового математического выражения в математическое.
 def text_to_math(expression):
-    """Преобразуем текстовое выражение в математическое."""
-    # Заменяем текстовые операции на математические символы.
+    '''Converts a text expression into a mathematical form.
+
+    Args:
+        expression (str): an easy-to-format string with a text record of an arithmetic operation.
+
+    Returns:
+        ... (str): a list with formatted text combined into a string.
+    '''
+
     for word, symbol in OPERATIONS.items():
         expression = expression.replace(word, symbol)
-
-    words = expression.split()  # Разбиваем выражение на отдельные слова.
-    new_expression = []  # Новый список для хранения математического выражения.
-    i = 0  # Индекс для обхода списка слов.
-
-    # Проходим по всем словам в выражении.
+    words = expression.split()
+    new_expression = []
+    i = 0
     while i < len(words):
         if words[i] in WORDS_TO_NUMS:
-            # Если текущее слово — это число, проверяем следующее.
             if i + 1 < len(words) and words[i + 1] in WORDS_TO_NUMS:
-                # Если следующее слово тоже число, объединяем их.
                 number = words_to_number(f"{words[i]} {words[i + 1]}")
-                new_expression.append(str(number))  # Добавляем число в выражение.
-                i += 2  # Пропускаем два слова.
+                new_expression.append(str(number))
+                i += 2
             else:
-                new_expression.append(str(WORDS_TO_NUMS[words[i]]))  # Просто добавляем число.
+                new_expression.append(str(WORDS_TO_NUMS[words[i]]))
                 i += 1
         else:
-            new_expression.append(words[i])  # Добавляем операцию или символ.
+            new_expression.append(words[i])
             i += 1
-
-    # Возвращаем преобразованное выражение.
     return " ".join(new_expression)
 
-
-# Функция для вычисления математического выражения.
 def calculate(expression):
+    '''Сounts the values of an arithmetic operation.
+
+    Args:
+        expression (str): an easy-to-format string with a text record of an arithmetic operation.
+
+    Returns:
+        result (str): the result of executing the eval function.
+        e (Exception): calculation error.
+    '''
+
     try:
-        result = eval(expression)  # Оцениваем выражение.
-        return result  # Возвращаем результат.
+        result = eval(expression)
+        return result
     except Exception as e:
-        return f"Ошибка вычисления: {e}"  # В случае ошибки возвращаем сообщение об ошибке.
+        return f"Ошибка вычисления: {e}"
 
-
-# Основная функция программы.
 def main():
-    print("Введите арифметическое выражение (например, 'двадцать пять плюс тринадцать'), или 'выход' для завершения.")  # Сообщение для пользователя.
+    '''The main function that is called when the code is run.
+
+    The function works as a procedure, it does not accept or return values.
+    '''
+
+    print("Для выхода введите 'выход'.")
 
     while True:
-        # Получаем ввод от пользователя.
         text_expression = input("Ваше выражение: ")
 
         if text_expression.lower() == "выход":
-            print("До свидания!")  # Выход из программы.
+            print("До свидания!")
             break
-
-        # Подготовка текста, чтобы корректно обработать операторы умножения и деления.
         text_expression = re.sub(r"(умножить на|разделить на)", r" \1 ", text_expression)
-
-        # Преобразуем текстовое выражение в математическое.
         math_expression = text_to_math(text_expression)
-
-        # Вычисляем результат.
         result = calculate(math_expression)
-
-        # Если результат — это число, преобразуем его в текст.
         if isinstance(result, (int, float)):
             result_text = number_to_words(int(result)) if result == int(result) else str(result)
-            print(f"Результат: {result_text}")  # Выводим результат в виде текста или числа.
+            print(f"Результат: {result_text}")
         else:
-            print(f"Результат: {result}")  # Если произошла ошибка, выводим её.
-
-
-# Запуск программы.
+            print(f"Результат: {result}")
 if __name__ == "__main__":
     main()
+
