@@ -29,10 +29,6 @@ def number_to_words(number):
     if number in NUMS_TO_WORDS:
         return NUMS_TO_WORDS[number]
     parts = []
-    if number >= 100:
-        hundreds = (number // 100) * 100
-        parts.append(NUMS_TO_WORDS[hundreds])
-        number %= 100
     if number >= 20:
         tens = (number // 10) * 10
         parts.append(NUMS_TO_WORDS[tens])
